@@ -1,0 +1,16 @@
+indicator_id,high,low,medium,unavailable,zero_estimate
+bachelors_plus,198,86,137,6,1
+median_age,348,10,64,6,0
+median_hh_income,238,38,137,15,0
+median_home_value,306,33,70,19,0
+no_hs_diploma,1,325,93,6,3
+no_vehicle,8,311,88,7,14
+other_vacant,3,305,60,7,53
+pop_total,358,2,62,0,6
+poverty_rate,25,240,156,7,0
+rent_burden_30,77,133,201,10,7
+rent_burden_50,16,265,111,10,26
+renter_share,162,79,180,7,0
+single_parent,51,250,110,10,7
+unemployment_rate,2,388,22,7,9
+vacancy_rate,13,290,104,7,14
