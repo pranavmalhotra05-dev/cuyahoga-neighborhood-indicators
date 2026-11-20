@@ -1,0 +1,9 @@
+year,cpi_u_annual_avg,source,retrieved
+2017,245.120,BLS series CUUR0000SA0 via api.bls.gov/publicAPI/v1,2026-11-20
+2018,251.107,BLS series CUUR0000SA0 via api.bls.gov/publicAPI/v1,2026-11-20
+2019,255.657,BLS series CUUR0000SA0 via api.bls.gov/publicAPI/v1,2026-11-20
+2020,258.811,BLS series CUUR0000SA0 via api.bls.gov/publicAPI/v1,2026-11-20
+2021,270.970,BLS series CUUR0000SA0 via api.bls.gov/publicAPI/v1,2026-11-20
+2022,292.655,BLS series CUUR0000SA0 via api.bls.gov/publicAPI/v1,2026-11-20
+2023,304.702,BLS series CUUR0000SA0 via api.bls.gov/publicAPI/v1,2026-11-20
+2024,313.689,BLS series CUUR0000SA0 via api.bls.gov/publicAPI/v1,2026-11-20

@@ -24,14 +24,25 @@ SENTINELS = {-666666666: "no_estimate", -555555555: "median_in_open_interval",
              -999999999: "not_available", -888888888: "not_applicable"}
 
 
-def clean(v):
-    """Return (value or None, flag or '')."""
+def clean(v, kind="E"):
+    """Return (value or None, flag or '').
+
+    A margin of error of -555555555 means the estimate is controlled to an independent
+    population count (for example county total population) and has no sampling error;
+    it is stored as MOE 0 with the flag controlled_estimate. The same code on an estimate
+    means a median falling in an open-ended interval and stays NULL."""
     if v is None or v == "":
         return None, "blank"
+    if v.strip() == ".":
+        return None, "suppressed_dot"  # 2013-2017 files mark suppressed or unavailable cells with a period
     try:
         x = float(v)
     except ValueError:
         return None, "non_numeric"
+    if kind == "M" and x == -555555555:
+        return 0.0, "controlled_estimate"
+    if kind == "M" and x == -333333333:
+        return None, "top_coded_median"  # the estimate is the open-ended top value, not a measured median
     if x in SENTINELS:
         return None, SENTINELS[int(x)]
     if x <= -100000000:
@@ -104,13 +115,15 @@ def vintage_2017():
 
 
 def finish(df, vintage):
-    vals = df["raw"].map(clean)
+    vals = [clean(r, k) for r, k in zip(df["raw"], df["kind"])]
     df["value"] = [v[0] for v in vals]
     df["flag"] = [v[1] for v in vals]
     est = df[df.kind == "E"].rename(columns={"value": "estimate", "flag": "flag_e"})
     moe = df[df.kind == "M"].rename(columns={"value": "moe", "flag": "flag_m"})
     m = est[["geoid", "geo_level", "variable", "estimate", "flag_e"]].merge(
         moe[["geoid", "variable", "moe", "flag_m"]], on=["geoid", "variable"], how="outer")
+    top = m["flag_m"] == "top_coded_median"
+    m.loc[top, "estimate"] = None  # a censored median is treated as unavailable, never as a number
     m["flag"] = (m["flag_e"].fillna("") + "|" + m["flag_m"].fillna("")).str.strip("|")
     m["vintage"] = vintage
     return m[["vintage", "geo_level", "geoid", "variable", "estimate", "moe", "flag"]]

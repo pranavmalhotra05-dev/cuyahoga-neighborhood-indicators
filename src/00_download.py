@@ -54,7 +54,25 @@ def fetch(rel, url):
     return dest, True
 
 
+def fetch_cpi():
+    """CPI-U (all items, U.S. city average, not seasonally adjusted) annual averages from the BLS public API.
+    Used only to express 2013-2017 dollars in 2024 dollars."""
+    import json
+    body = json.dumps({"seriesid": ["CUUR0000SA0"], "startyear": "2017", "endyear": "2024", "annualaverage": True}).encode()
+    req = urllib.request.Request("https://api.bls.gov/publicAPI/v1/timeseries/data/", data=body,
+                                 headers={"Content-Type": "application/json"})
+    d = json.load(urllib.request.urlopen(req, timeout=60))
+    rows = [(r["year"], r["value"]) for r in d["Results"]["series"][0]["data"] if r["period"] == "M13"]
+    with open(ROOT / "data" / "cpi_u_annual.csv", "w", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["year", "cpi_u_annual_avg", "source", "retrieved"])
+        for y, v in sorted(rows):
+            w.writerow([y, v, "BLS series CUUR0000SA0 via api.bls.gov/publicAPI/v1", datetime.date.today().isoformat()])
+
+
 def main():
+    if not (ROOT / "data" / "cpi_u_annual.csv").exists():
+        fetch_cpi()
     rows = []
     for rel, url in FILES:
         for attempt in range(3):
