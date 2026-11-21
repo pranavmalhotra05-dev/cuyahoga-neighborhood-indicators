@@ -146,8 +146,9 @@ st = q("""SELECT t.geoid, (s.geoid_2020 IS NOT NULL) AS stable, i.value
           JOIN v_indicator i ON i.geoid = t.geoid AND i.vintage = '2020-2024' AND i.indicator_id = 'poverty_rate'
           WHERE t.tract_vintage = 2020 AND i.value IS NOT NULL""")
 N["poverty_2020_2024_median_stable_tracts"] = round(st[st.stable].value.median(), 1)
-N["poverty_2020_2024_median_changed_boundary_tracts"] = round(st[~st.stable].value.median(), 1)
-N["changed_boundary_tracts_2020"] = int((~st.stable).sum())
+N["poverty_2020_2024_median_not_stable_tracts"] = round(st[~st.stable].value.median(), 1)
+N["not_stable_2020_tracts_with_poverty_value"] = int((~st.stable).sum())
+N["not_stable_2020_tracts_all"] = int(q("SELECT count(*) AS n FROM dim_tract WHERE tract_vintage = 2020 AND geoid NOT IN (SELECT geoid_2020 FROM v_stable_tract)").n[0])
 
 # 5. Chart
 fig, ax = plt.subplots(1, 2, figsize=(11.5, 5.2))

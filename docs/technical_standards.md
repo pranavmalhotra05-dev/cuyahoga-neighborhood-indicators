@@ -12,7 +12,7 @@ These are the rules the project follows so that a number in the viewer can be tr
 ## 2. Geography and identifiers
 
 - A tract is identified by its 11 character GEOID (state 2, county 3, tract 6). The pair (tract geography year, GEOID) is the key, because a GEOID can mean different land in 2010 and 2020.
-- Only tracts with essentially unchanged boundaries are compared tract by tract across vintages: land overlap of at least 99 percent of both tracts, one to one (`v_stable_tract`). The result is cross-checked with a GeoPandas overlay in `src/04_spatial_checks.py`.
+- Only tracts with essentially unchanged boundaries are compared tract by tract across vintages: land overlap of at least 99 percent of both tracts, with no other tract overlapping either by more than 1 percent of its land (`v_stable_tract`; stability is judged by land area, not by population). The result is cross-checked with a GeoPandas overlay in `src/04_spatial_checks.py`.
 - Point data (geocoded addresses) is assigned to tracts with a spatial join in an explicit coordinate reference system, and the Census geocoder's own tract assignment is compared against it.
 
 ## 3. Estimates, margins of error and suppression
@@ -22,7 +22,7 @@ These are the rules the project follows so that a number in the viewer can be tr
 - An indicator is NULL if any cell of its numerator or denominator is NULL. No imputation is done.
 - MOE of a sum is the square root of the sum of squared MOEs. MOE of a proportion uses the Census formula for a proportion, falling back to the ratio formula when the radicand is negative. MOE of a difference between two vintages is the square root of the sum of squared MOEs, which assumes the two five-year samples are independent (they do not overlap in time, so this is reasonable).
 - Coefficient of variation CV = (MOE / 1.645) / estimate. Reliability classes: high when CV is below 0.15, medium from 0.15 to 0.30, low above 0.30. These thresholds are a common convention, not a Census rule. Maps and the viewer show the class next to every value.
-- A change is called distinguishable when its absolute value is larger than the MOE of the difference. It is a screening rule at 90 percent confidence, and with 321 comparisons a few false signals are expected.
+- A change is called distinguishable when its absolute value is larger than the MOE of the difference. It is a screening rule at 90 percent confidence, and over 321 comparisons about 10 percent (around 32 tracts) would be flagged by chance even if nothing changed.
 
 ## 4. Money
 

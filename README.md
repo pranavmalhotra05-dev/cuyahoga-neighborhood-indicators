@@ -14,7 +14,7 @@ All numbers come from `outputs/analysis_numbers.json` and the other files under 
 - **At tract level most of the change cannot be separated from noise.** I compared the 321 tracts with unchanged boundaries and a poverty estimate in both periods. The median margin of error of a tract's change is 10.1 points. Only 50 tracts (15.6%) show a change larger than its margin: 44 down, 6 up. For another 184 tracts the point estimate fell and for 137 it rose.
 - **A single tract poverty estimate is wide.** For 2020-2024 the median 90% margin of error is 7.0 points and 57.0% of tracts have a coefficient of variation above 0.30. Among the 20 tracts with the highest estimated poverty, 10 have an interval that reaches below the 90th-percentile cut-off of 44.0%, so a ranking of the "poorest" tracts is partly a ranking of luck.
 - **The biggest drops are partly an artifact.** The tracts with the highest starting poverty (median 39.8%) fell a median 7.6 points. A simulation that adds only sampling noise to the 2013-2017 values and assumes no true change produces a median change of -2.5 points in that top quartile, because tracts picked for being high in noisy data tend to be lower the next time. Part of the drop is real (the tract-to-tract rank correlation between periods is 0.83), but roughly a third of it is what noise alone would give.
-- **The tracts I can compare are not a random sample.** Census tract boundaries were redrawn in 2020 (447 tracts in 2010, 428 in 2020). Only 324 pairs are essentially unchanged. The 100 tracts of 2020 that are new or changed have median poverty of 19.4%, against 12.4% for the unchanged ones. The tract-level result describes the stable, less poor part of the county.
+- **The tracts I can compare are not a random sample.** Census tract boundaries were redrawn in 2020 (447 tracts in 2010, 428 in 2020). Only 324 pairs are essentially unchanged. The 104 tracts of 2020 that are new or changed (100 of them with a poverty value) have median poverty of 19.4%, against 12.4% for the unchanged ones. The tract-level result describes the stable, less poor part of the county.
 
 ![Poverty change](docs/img/poverty_change.png)
 ![Change map](docs/img/map_poverty_change_stable.png)
@@ -44,7 +44,10 @@ Static HTML, CSS and JavaScript in `web/`, drawing the tract polygons itself (no
 ## Limits
 
 - Two vintages only. The ACS 5-year periods do not overlap, so the margin of the difference assumes independent samples.
-- "Distinguishable" is a 90% screening rule used over hundreds of tracts, so a few false signals are expected, and non-signals are not proof of no change.
+- "Distinguishable" is a 90% screening rule. With no true change at all, about 10% of 321 tracts (around 32) would be flagged by chance, split between down and up, so of the 50 flagged only the excess of downward moves (44 down, 6 up) is clearly beyond chance. Non-signals are not proof of no change.
+- ACS 2020-2024 includes survey year 2020, when data collection was disrupted.
+- "Stable" is judged by land area, and by a one-percent sliver rule: overlaps under 1% of a tract are ignored. A stricter one-to-one reading keeps 228 tracts and moves the results only a little (see the review).
+- The margin of the change in rent burden depends on how the denominator margin is built; it is 1.11 points here and 1.35 with the published cell margins. The change is distinguishable either way.
 - Tract comparison covers only tracts whose boundaries did not change materially, and these are less poor than the rest.
 - The regression-to-the-mean simulation is a rough size estimate, not a correction.
 - The Census API now needs a key, so I used the bulk summary files; they are the same published tables.
