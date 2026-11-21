@@ -69,7 +69,7 @@ for ind, g in ch.groupby("indicator_id"):
                  "median_change_moe": g.change_moe.median()})
 summ = pd.DataFrame(summ).sort_values("indicator")
 summ.to_csv(ROOT / "outputs" / "analysis_tract_change_summary.csv", index=False)
-p = ch[ch.indicator_id == "poverty_rate"].copy()
+p = ch[ch.indicator_id == "poverty_rate"].sort_values("geoid_2020").reset_index(drop=True)
 N["poverty_tracts_compared"] = len(p)
 N["poverty_median_change_pts"] = round(p.change.median(), 2)
 N["poverty_mean_change_pts"] = round(p.change.mean(), 2)

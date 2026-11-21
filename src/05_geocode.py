@@ -90,7 +90,36 @@ def oneline(address):
     return with_retry(f, "one-line geocode", tries=3)
 
 
+def reload_cached():
+    """SKIP_GEOCODE=1: rebuild geocode_sample from data/geocode_results.csv without any network call.
+    The report in outputs/geocode_report.md is left as written by the last live run."""
+    r = pd.read_csv(ROOT / "data" / "geocode_results.csv", dtype={"state_fips": str, "county_fips": str, "tract_code": str})
+    ok = r["geocoder_status"] == "Match"
+    ll = r["coords"].str.split(",", expand=True)
+    r["lon"] = pd.to_numeric(ll[0], errors="coerce")
+    r["lat"] = pd.to_numeric(ll[1], errors="coerce")
+    r["t20"] = (r["state_fips"] + r["county_fips"] + r["tract_code"]).where(ok)
+    t10 = gpd.read_file(f"zip://{TIGER / 'tl_2017_39_tract.zip'}")
+    t10 = t10[t10["COUNTYFP"] == "035"][["GEOID", "geometry"]].rename(columns={"GEOID": "t10"})
+    pts = gpd.GeoDataFrame({"address_id": r.loc[ok, "address_id"]}, geometry=gpd.points_from_xy(r.loc[ok, "lon"], r.loc[ok, "lat"]), crs="EPSG:4269")
+    j = gpd.sjoin(pts, t10, how="left", predicate="within").drop_duplicates("address_id").set_index("address_id")["t10"]
+    r["t10"] = r["address_id"].map(j)
+    status = r["geocoder_status"].fillna("No_Response")
+    status = status.where(~ok, "Match-" + r["geocoder_match_type"].fillna(""))
+    tbl = pd.DataFrame({"address_id": r["address_id"], "source": SRC_LABEL, "name": r["school_name"],
+                        "input_address": r["input_address"], "match_status": status,
+                        "matched_address": r["matched_address"], "lon": r["lon"], "lat": r["lat"],
+                        "tract_geoid_2020": r["t20"], "tract_geoid_2010": r["t10"]})
+    con = duckdb.connect(str(DB))
+    con.execute("DELETE FROM geocode_sample")
+    con.execute("INSERT INTO geocode_sample SELECT * FROM tbl")
+    print("reloaded geocode_sample from cache:", con.execute("SELECT count(*) FROM geocode_sample").fetchone()[0], "rows")
+
+
 def main():
+    import os
+    if os.environ.get("SKIP_GEOCODE") == "1" and (ROOT / "data" / "geocode_results.csv").exists():
+        return reload_cached()
     today = date.today().isoformat()
     say("# Geocoding report")
     say()
