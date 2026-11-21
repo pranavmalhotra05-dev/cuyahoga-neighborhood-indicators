@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cuyahoga County neighborhood indicators</title>
+<meta name="description" content="Census tract indicators for Cuyahoga County, Ohio, from the American Community Survey, with margins of error and reliability classes.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Crect width=%2716%27 height=%2716%27 rx=%273%27 fill=%27%2312263a%27/%3E%3Crect x=%273%27 y=%273%27 width=%275%27 height=%275%27 fill=%27%23fe9929%27/%3E%3Crect x=%278%27 y=%278%27 width=%275%27 height=%275%27 fill=%27%23d95f0e%27/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<a class="skip" href="#table-card">Skip to the data table</a>
+
+<header class="site-header">
+  <div class="wrap">
+    <h1>Cuyahoga County neighborhood indicators</h1>
+    <p class="lede">Census tract estimates from the American Community Survey (5-year), with the margin of error and a reliability class shown for every number.</p>
+  </div>
+</header>
+
+<main class="wrap" id="main">
+  <section class="controls" aria-label="Controls">
+    <div class="field">
+      <label for="indicator">Indicator</label>
+      <select id="indicator"></select>
+    </div>
+    <div class="field">
+      <label for="vintage">ACS 5-year period</label>
+      <select id="vintage"></select>
+    </div>
+    <div class="field">
+      <label for="reliability">Reliability filter</label>
+      <select id="reliability">
+        <option value="all">All tracts</option>
+        <option value="hm">High or medium reliability only</option>
+        <option value="low">Low reliability only</option>
+        <option value="avail">Hide unavailable estimates</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="search">Search tract number or ID</label>
+      <input id="search" type="search" inputmode="search" autocomplete="off" placeholder="for example 1234 or 39035">
+    </div>
+    <div class="field field-action">
+      <button id="download" type="button" class="btn">Download CSV</button>
+    </div>
+  </section>
+
+  <p id="geo-banner" class="banner" role="status"></p>
+  <p id="indicator-def" class="def"></p>
+
+  <p id="timings" class="timings" aria-label="Measured timings"></p>
+  <p id="api-line" class="api-line" hidden>
+    <label><input type="checkbox" id="use-api"> Query the live database API instead of the static file</label>
+    <span id="api-timing" class="mono"></span>
+  </p>
+  <p id="error" class="error" role="alert" hidden></p>
+
+  <div class="grid">
+    <section class="card" aria-labelledby="map-title">
+      <h2 id="map-title">Map</h2>
+      <div class="map-wrap" id="map-wrap">
+        <svg id="map" role="img" aria-labelledby="map-title map-desc" focusable="false"></svg>
+        <p id="map-desc" class="visually-hidden">Choropleth map of census tracts. The same values are listed in the table, which can be used with the keyboard.</p>
+        <div id="tooltip" class="tooltip" role="presentation" hidden></div>
+      </div>
+      <div id="legend" class="legend" aria-label="Legend"></div>
+      <div id="detail" class="detail" aria-live="polite"></div>
+    </section>
+
+    <section class="card" id="table-card" aria-labelledby="table-title">
+      <div class="card-head">
+        <h2 id="table-title">Tracts</h2>
+        <p id="count" class="count" aria-live="polite"></p>
+      </div>
+      <div class="table-scroll" id="table-scroll" tabindex="0" role="region" aria-label="Tract table, scrollable">
+        <table id="tbl">
+          <caption class="visually-hidden">Census tracts with estimate, margin of error and reliability class. Press a column heading to sort. Press Enter on a row to select it.</caption>
+          <thead>
+            <tr>
+              <th scope="col" aria-sort="none"><button type="button" data-key="name">Tract</button></th>
+              <th scope="col" aria-sort="none"><button type="button" data-key="geoid">GEOID</button></th>
+              <th scope="col" aria-sort="descending" class="num"><button type="button" data-key="value">Value</button></th>
+              <th scope="col" aria-sort="none" class="num"><button type="button" data-key="moe">Margin of error</button></th>
+              <th scope="col" aria-sort="none"><button type="button" data-key="rel">Reliability</button></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <section class="notes card" aria-labelledby="notes-title">
+    <h2 id="notes-title">How to read this</h2>
+    <h3>Margins of error</h3>
+    <p>Every figure is a survey estimate, not a count. The margin of error (MOE) is the 90 percent margin published by the Census Bureau, combined with the standard formulas when an indicator is a sum or a ratio of several table cells. A value of 20 percent with an MOE of 5 points means the true value is likely between 15 and 25 percent. Small tracts and rare conditions have wide margins.</p>
+    <p>Reliability is based on the coefficient of variation (CV), the standard error divided by the estimate: <span id="rel-rules"></span> Low reliability tracts are drawn with diagonal hatching on the map and flagged in the table. Do not rank tracts whose margins overlap.</p>
+    <h3>Tract boundaries changed in 2020</h3>
+    <p id="boundary-note"></p>
+    <h3>Source</h3>
+    <p id="source-note"></p>
+    <p id="tables-note"></p>
+    <details>
+      <summary>Data dictionary</summary>
+      <dl id="dictionary"></dl>
+    </details>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap"><p id="footer-line"></p></div>
+</footer>
+
+<script src="js/app.js"></script>
+</body>
+</html>
